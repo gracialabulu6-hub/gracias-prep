@@ -133,7 +133,7 @@ footer { text-align:center; padding:15px; background:#fbbc05; color:black; font-
 <header>
 
 <div style="display:flex; align-items:center; gap:10px;">
-<img src="C:\Users\user\Desktop\mon projet\static\logo.jpg" class="logo">
+<img src="C:\Users\user\Desktop\mon projet\static\logo.jpeg" class="logo">
 <div>GRACIAS PREP</div>
 </div>
 
@@ -236,6 +236,7 @@ def reset():
 if __name__ == "__main__":
     print("Ouvre ton navigateur et va sur : http://127.0.0.1:5000")
     app.run(host='0.0.0.0', port=5000)
+
 
 
 
