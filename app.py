@@ -1,19 +1,7 @@
-# GRACIAS PREP - Système de présence avec login pour tous les employés
-from flask import Flask, render_template_string, request, redirect, url_for, session
+from flask import Flask, render_template_string, request, redirect, url_for
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = "super_secret_key_123"
-
-# ---------- UTILISATEURS / LOGIN ----------
-users = {
-    "gracias@example.com": {"password": "285", "role": "employee"},
-    "labulu@example.com": {"password": "320", "role": "employee"},
-    "kabamba@example.com": {"password": "588", "role": "employee"},
-    "shimiah@example.com": {"password": "1234", "role": "employee"},
-    "moula@example.com": {"password": "3232", "role": "employee"},
-    "admin@example.com": {"password": "admin123", "role": "admin"}
-}
 
 # ---------- EMPLOYÉS ----------
 employes = {
@@ -25,160 +13,203 @@ employes = {
 }
 
 presences = {}
+message = ""
 
-# ---------- TEMPLATE LOGIN ----------
-login_template = """
-<!DOCTYPE html>
-<html lang='fr'>
-<head>
-<meta charset='UTF-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1.0'>
-<title>Connexion — GRACIAS PREP</title>
-<style>
-body { font-family: Arial; background:#e8f0fe; display:flex; justify-content:center; align-items:center; height:100vh; }
-.container { background:white; padding:30px; border-radius:12px; width:320px; box-shadow:0 4px 15px rgba(0,0,0,0.1); }
-h2 { text-align:center; margin-bottom:20px; }
-input { width:100%; padding:10px; margin:10px 0; border:1px solid #ccc; border-radius:8px; }
-button { width:100%; background:#4285f4; color:white; padding:10px; border:none; border-radius:8px; cursor:pointer; font-size:16px; }
-button:hover { background:#3367d6; }
-.error { color:#d93025; font-weight:bold; text-align:center; }
-</style>
-</head>
-<body>
-<div class='container'>
-<h2>Connexion</h2>
-<form method='post' action='/login'>
-<input type='email' name='email' placeholder='Email' required>
-<input type='password' name='password' placeholder='Code employé' required>
-<button type='submit'>Se connecter</button>
-</form>
-{% if error %}<p class='error'>{{ error }}</p>{% endif %}
-</div>
-</body>
-</html>
-"""
-
-# ---------- TEMPLATE DASHBOARD ----------
-main_template = """
+# ---------- TEMPLATE HTML MODERNE ----------
+html_template = """
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GRACIAS PREP</title>
+<title>GRACIAS PREP - Présences</title>
 
 <style>
-body { font-family: Arial; background:#e8f0fe; color:#333; margin:0; padding:0;}
 
-header { 
-background:#4285f4; 
-color:white; 
-padding:15px; 
-font-size:24px; 
-font-weight:bold; 
-display:flex; 
-justify-content:space-between; 
-align-items:center; 
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #f1f5f9;
 }
 
-.logo{
-height:50px;
-margin-left:10px;
+/* HEADER */
+header {
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    color: white;
+    padding: 20px;
+    text-align: center;
 }
 
-.logout { 
-background:#d93025; 
-padding:8px 14px; 
-border-radius:8px; 
-color:white; 
-text-decoration:none; 
-margin-right:20px; 
+header img {
+    width: 120px;
+    height: auto;
 }
 
-main { padding:20px; display:flex; flex-wrap:wrap; justify-content:center; gap:30px;}
-
-.section { 
-background:white; 
-border-radius:12px; 
-box-shadow:0 4px 10px rgba(0,0,0,0.1); 
-padding:20px; 
-width:300px;
+/* GRID */
+main {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
 }
 
-input[type="text"] { width:80%; padding:8px; margin-bottom:10px; font-size:14px; }
-
-button { 
-background-color:#34a853; 
-color:white; 
-border:none; 
-padding:8px 12px; 
-border-radius:8px; 
-cursor:pointer; 
-font-size:14px; 
-margin-top:5px; 
+/* CARD */
+.section {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: 0.2s;
 }
 
-button:hover { background-color:#2c8c45; }
+.section:hover {
+    transform: translateY(-4px);
+}
 
-.present { color:#0b8043; font-weight:bold; }
-.absent { color:#d93025; font-weight:bold; }
+/* TITRE */
+h3 {
+    margin-bottom: 15px;
+}
 
-footer { text-align:center; padding:15px; background:#fbbc05; color:black; font-weight:bold;}
+/* INPUT */
+input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+
+/* BUTTON */
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 10px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1d4ed8;
+}
+
+/* STATS */
+.stats {
+    display: flex;
+    justify-content: space-between;
+}
+
+.stat {
+    flex: 1;
+    text-align: center;
+}
+
+/* COLORS */
+.present { color: #16a34a; font-weight: bold; }
+.absent { color: #dc2626; font-weight: bold; }
+
+/* MESSAGE */
+.message {
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.success { color: green; }
+.error { color: red; }
+
+footer {
+    text-align: center;
+    padding: 15px;
+    color: #555;
+}
+
 </style>
-
 </head>
 
 <body>
 
 <header>
-
-<div style="display:flex; align-items:center; gap:10px;">
-<img src="C:\Users\user\Desktop\mon projet\static\logo.jpeg" class="logo">
-<div>GRACIAS PREP</div>
-</div>
-
-<a class="logout" href="/logout">Déconnexion</a>
-
+    <img src="https://i.imgur.com/u8yP1y6.png" alt="Logo GRACIAS">
+    <h2>GRACIAS PREP - Système de Présence</h2>
+    <p>{{ date }}</p>
 </header>
 
 <main>
 
-<div class="section">
-<h3>Marquer présence</h3>
-<form method="post" action="/marquer">
-<input type="text" name="code_emp" placeholder="Entrez votre code employé">
-<br>
-<button type="submit">Marquer présence</button>
-</form>
-</div>
+    {% if message %}
+    <div class="section message {{ 'success' if '✔' in message else 'error' }}">
+        {{ message }}
+    </div>
+    {% endif %}
 
-<div class="section">
-<h3>Présents</h3>
-<ul>
-{% for emp, heure in presences.items() %}
-<li><span class="present">{{ emp }}</span> - {{ heure }}</li>
-{% endfor %}
-</ul>
-</div>
+    <!-- ACTION -->
+    <div class="section">
+        <h3>Pointer un employé</h3>
+        <form method="post" action="/marquer">
+            <input type="text" name="code_emp" placeholder="Code employé" required>
+            <button type="submit">Valider</button>
+        </form>
+    </div>
 
-<div class="section">
-<h3>Absents</h3>
-<ul>
-{% for emp in absents %}
-<li><span class="absent">{{ emp }}</span></li>
-{% endfor %}
-</ul>
-</div>
+    <!-- STATS -->
+    <div class="section">
+        <h3>Statistiques</h3>
+        <div class="stats">
+            <div class="stat">
+                <h2>{{ employes|length }}</h2>
+                <p>Total</p>
+            </div>
+            <div class="stat">
+                <h2 style="color:green;">{{ presences|length }}</h2>
+                <p>Présents</p>
+            </div>
+            <div class="stat">
+                <h2 style="color:red;">{{ absents|length }}</h2>
+                <p>Absents</p>
+            </div>
+        </div>
+    </div>
 
-<div class="section">
-<form method="post" action="/reset">
-<button type="submit" style="background:#fbbc05; color:black;">Nouvelle journée</button>
-</form>
-</div>
+    <!-- PRESENTS -->
+    <div class="section">
+        <h3>Présents</h3>
+        <ul>
+        {% for emp, heure in presences.items() %}
+            <li>
+                <span class="present">{{ emp }}</span><br>
+                🕒 {{ heure }}
+            </li><br>
+        {% endfor %}
+        </ul>
+    </div>
+
+    <!-- ABSENTS -->
+    <div class="section">
+        <h3>Absents</h3>
+        <ul>
+        {% for emp in absents %}
+            <li class="absent">{{ emp }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+
+    <!-- RESET -->
+    <div class="section">
+        <form method="post" action="/reset">
+            <button style="background:#f59e0b;">Nouvelle journée</button>
+        </form>
+    </div>
 
 </main>
 
-<footer>© 2025 GRACIAS PREP</footer>
+<footer>
+    © 2026 GRACIAS PREP — Système de Présence
+</footer>
 
 </body>
 </html>
@@ -186,62 +217,46 @@ footer { text-align:center; padding:15px; background:#fbbc05; color:black; font-
 
 # ---------- ROUTES ----------
 @app.route('/')
-def home():
-    if "user" not in session:
-        return redirect(url_for('login_page'))
+def accueil():
     return render_template_string(
-        main_template,
+        html_template,
         presences=presences,
-        absents=[e for e in employes if e not in presences]
+        employes=employes,
+        absents=[e for e in employes if e not in presences],
+        date=datetime.now().strftime("%d/%m/%Y"),
+        message=message
     )
-
-@app.route('/login', methods=['GET', 'POST'])
-def login_page():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        if email in users and users[email]["password"] == password:
-            session["user"] = email
-            return redirect(url_for('home'))
-        return render_template_string(login_template, error="Identifiants incorrects")
-    return render_template_string(login_template)
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login_page'))
 
 @app.route('/marquer', methods=['POST'])
 def marquer():
-    if "user" not in session:
-        return redirect(url_for('login_page'))
+    global message
+
     code_emp = request.form.get('code_emp')
     nom = None
+
     for e, c in employes.items():
         if c == code_emp:
             nom = e
             break
-    if nom and nom not in presences:
-        presences[nom] = datetime.now().strftime("%H:%M:%S")
-    return redirect(url_for('home'))
+
+    if nom:
+        if nom not in presences:
+            presences[nom] = datetime.now().strftime("%H:%M:%S")
+            message = "✔ Présence enregistrée"
+        else:
+            message = "⚠ Déjà enregistré"
+    else:
+        message = "❌ Code incorrect"
+
+    return redirect(url_for('accueil'))
 
 @app.route('/reset', methods=['POST'])
 def reset():
-    if "user" not in session:
-        return redirect(url_for('login_page'))
+    global message
     presences.clear()
-    return redirect(url_for('home'))
+    message = "🔄 Nouvelle journée démarrée"
+    return redirect(url_for('accueil'))
 
-# ---------- LANCEMENT ----------
+# ---------- RUN ----------
 if __name__ == "__main__":
-    print("Ouvre ton navigateur et va sur : http://127.0.0.1:5000")
-    app.run(host='0.0.0.0', port=5000)
-
-
-
-
-
-
-
-
-
+    app.run(debug=True)
