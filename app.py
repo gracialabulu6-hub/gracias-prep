@@ -109,9 +109,9 @@ html_template = """
 </head>
 <body>
 
-<header>
-    <!-- Ton logo -->
-    <img src="https://i.imgur.com/5wvXYMu.jpeg" alt="Logo GRACIAS">
+<header style="background: rgba(255,255,255,0.25); backdrop-filter: blur(10px); text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.4);">
+    <!-- Logo GRACIAS -->
+    <img src="https://i.imgur.com/5wvXYMu.jpeg" alt="Logo GRACIAS" style="width:140px; height:auto; display:block; margin:0 auto;">
     <h2 style="color:white; margin-top:10px;">Système de Présence</h2>
 </header>
 
