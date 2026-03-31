@@ -111,7 +111,7 @@ html_template = """
 
 <header>
     <!-- Ton logo -->
-    <img src="{{ url_for:\Users\user\Desktop\mon projet\static',filename='logo.png') }}" alt="Logo GRACIAS">
+    <img src="https://i.imgur.com/5wvXYMu.jpeg" alt="Logo GRACIAS">
     <h2 style="color:white; margin-top:10px;">Système de Présence</h2>
 </header>
 
