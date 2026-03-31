@@ -111,7 +111,7 @@ html_template = """
 
 <header>
     <!-- Ton logo -->
-    <img src="\mon projet\static" alt="Logo GRACIAS">
+    <img src=":\Users\user\Desktop\mon projet\static" alt="Logo GRACIAS">
     <h2 style="color:white; margin-top:10px;">Système de Présence</h2>
 </header>
 
