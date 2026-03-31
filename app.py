@@ -109,10 +109,18 @@ html_template = """
 </head>
 <body>
 
-<header style="background: rgba(255,255,255,0.25); backdrop-filter: blur(10px); text-align:center; padding:20px; border-bottom:1px solid rgba(255,255,255,0.4);">
+<header style="
+    background: linear-gradient(135deg, #3c82f6, #7b2ff7);
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+">
     <!-- Logo GRACIAS -->
-    <img src="https://i.imgur.com/5wvXYMu.jpeg" alt="Logo GRACIAS" style="width:140px; height:auto; display:block; margin:0 auto;">
-    <h2 style="color:white; margin-top:10px;">Système de Présence</h2>
+    <img src="https://i.imgur.com/5wvXYMu.jpeg" alt="Logo GRACIAS" 
+         style="width:180px; height:auto; display:block; margin:0 auto 15px;">
+    <h2 style="color: white; font-family: Arial, sans-serif; font-weight: 700; margin: 0;">
+        Système de Présence
+    </h2>
 </header>
 
 <main>
